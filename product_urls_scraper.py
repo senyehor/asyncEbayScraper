@@ -3,10 +3,10 @@ from bs4 import BeautifulSoup
 
 
 class ProductLinksScraper:
-    __SEARCH_RESULTS_PAGE = 'https://www.ebay.com/sch/i.html?_nkw=nike+air+force+1'
 
-    def __init__(self, session: ClientSession):
+    def __init__(self, session: ClientSession, search_link: str):
         self.__session = session
+        self.__search_link = search_link
 
     async def get_urls(self) -> list[str]:
         soup = await self.__get_soup_from_page()
@@ -20,6 +20,6 @@ class ProductLinksScraper:
         return [a_tag['href'].split('?')[0] for a_tag in products_a_tags_with_product_link]
 
     async def __get_soup_from_page(self) -> BeautifulSoup:
-        async with self.__session.get(self.__SEARCH_RESULTS_PAGE) as result:
+        async with self.__session.get(self.__search_link) as result:
             html = await result.text()
             return BeautifulSoup(html, 'html.parser')
