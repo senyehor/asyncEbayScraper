@@ -54,4 +54,4 @@ if __name__ == '__main__':
     logger.info("started parsing")
     asyncio.run(main())
     end_time = time.time() - start_time
-    logger.info(f"finished in {end_time}")
+    logger.info(f"finished in {end_time:2f} seconds")
