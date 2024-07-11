@@ -1,6 +1,7 @@
 import asyncio
 from asyncio import Semaphore
 from typing import TypedDict
+import re
 
 from aiohttp import ClientSession
 from bs4 import BeautifulSoup
@@ -21,9 +22,9 @@ class ProductsInfoBulkScraper:
         self.__session = session
 
     async def fetch_products(self) -> list[ProductInfo]:
-        semaphore = asyncio.Semaphore(10)
+        semaphore = asyncio.Semaphore(8)
         products = []
-        fetch_products_tasks =[
+        fetch_products_tasks = [
             asyncio.create_task(
                 self.__fetch_specific_product_info(link, products, semaphore),
             ) for link in
@@ -64,9 +65,23 @@ class ProductsInfoBulkScraper:
 
     def __parse_product_name(self, soup: BeautifulSoup) -> str:
         _product_name_wrapper = soup.find(class_='x-item-title__mainTitle')
-        return _product_name_wrapper \
-            .find('span', class_='ux-textspans ux-textspans--BOLD') \
+        product_name = _product_name_wrapper \
+            .find(class_='ux-textspans ux-textspans--BOLD') \
             .string
+        if not product_name:
+            pass
+        # replace all unicode whitespaces with regular one's
+        product_name = re.sub(
+            r'\s',
+            ' ',
+            product_name
+        )
+        product_name = re.sub(
+            r'\u2019',
+            ' ',
+            product_name
+        )
+        return product_name
 
     def __parse_seller_name(self, soup: BeautifulSoup) -> str:
         _seller_name_div = soup.find('div', class_='x-sellercard-atf__info__about-seller')
