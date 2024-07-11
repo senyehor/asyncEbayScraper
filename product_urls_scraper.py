@@ -22,4 +22,10 @@ class ProductLinksScraper:
     async def __get_soup_from_page(self) -> BeautifulSoup:
         async with self.__session.get(self.__search_link) as result:
             html = await result.text()
-            return BeautifulSoup(html, 'html.parser')
+            soup = BeautifulSoup(html, 'html.parser')
+            self.__check_request_is_not_blocked(soup)
+            return soup
+
+    def __check_request_is_not_blocked(self, soup: BeautifulSoup):
+        if soup.title.string.lower() == 'access denied':
+            raise Exception('ebay blocked request')
