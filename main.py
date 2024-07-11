@@ -1,6 +1,7 @@
 import asyncio
 import json
-
+import time
+import logging
 from aiohttp import ClientSession
 
 from product_urls_scraper import ProductLinksScraper
@@ -43,4 +44,14 @@ async def main():
     write_products_info_to_file(products, 'products.json')
 
 if __name__ == '__main__':
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+    # Create a logger
+    logger = logging.getLogger(__name__)
+    start_time = time.time()
+    logger.info("started parsing")
     asyncio.run(main())
+    end_time = time.time() - start_time
+    logger.info(f"finished in {end_time}")
